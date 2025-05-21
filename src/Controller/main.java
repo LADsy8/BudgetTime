@@ -1,6 +1,9 @@
-package startup;
+package Controller;
 
-import App.BudgetApp;
+import java.awt.EventQueue;
+
+import Model.BudgetApp;
+import View.UI_Interface;
 
 public class main {
 
@@ -13,7 +16,16 @@ public class main {
 		System.out.println("Total Income: $" + budgetApp.calculateTotalIncome());
 		System.out.println("Total Expenses: $" + budgetApp.calculateTotalExpenses());
 		System.out.println("Budget Balance: $" + budgetApp.calculateBudgetBalance());
-
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UI_Interface frame = new UI_Interface();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 }

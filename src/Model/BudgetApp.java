@@ -1,9 +1,7 @@
-package App;
+package Model;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import Transactions.Transaction;
 
 public class BudgetApp {
 	private List<Transaction> transactions = new ArrayList<>();

@@ -1,4 +1,4 @@
-package Transactions;
+package Model;
 
 public class Transaction {
     private String description;
