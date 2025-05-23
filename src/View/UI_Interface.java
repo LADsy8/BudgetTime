@@ -20,9 +20,6 @@ public class UI_Interface extends JFrame {
 	private JTextField txtFieldAchat;
 	private JTextField txtEntrerLeMontant;
 
-	/**
-	 * Create the frame.
-	 */
 	public UI_Interface() {
 		setTitle("Suiveur de Budget");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -43,6 +40,7 @@ public class UI_Interface extends JFrame {
 		JButton btnAjout = new JButton("Ajout");
 		btnAjout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+
 			}
 		});
 		btnAjout.setBounds(486, 63, 89, 23);

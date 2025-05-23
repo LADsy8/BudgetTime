@@ -1,11 +1,6 @@
 package Model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class BudgetApp {
-
-	private List<Transaction> transactions = new ArrayList<>();
 
 	public void addTransaction(String description, double amount) {
 		Transaction transaction = new Transaction(description, amount);

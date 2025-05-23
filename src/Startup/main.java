@@ -1,4 +1,4 @@
-package Controller;
+package Startup;
 
 import java.awt.EventQueue;
 
@@ -8,6 +8,7 @@ public class main {
 
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+
 			public void run() {
 				try {
 					UI_Interface frame = new UI_Interface();
@@ -16,6 +17,7 @@ public class main {
 					e.printStackTrace();
 				}
 			}
+
 		});
 	}
 
