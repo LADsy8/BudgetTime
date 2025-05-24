@@ -1,10 +1,22 @@
 package Model;
 
-public class BudgetApp {
+import java.util.ArrayList;
 
-	public void addTransaction(String description, double amount) {
-		Transaction transaction = new Transaction(description, amount);
+public class TransactionList {
+
+	// POur le moment, juste une liste qui est retourner à la view, mais doit être
+	// changer.
+	private ArrayList<Transaction> transactions;
+
+	public void addTransaction(String description, double amount, String timeEntered) {
+		Transaction transaction = new Transaction(description, amount, timeEntered);
 		transactions.add(transaction);
+	}
+
+	// changer cela aussi
+	public ArrayList<Transaction> getTransactions() {
+
+		return transactions;
 	}
 
 	public double calculateTotalIncome() {

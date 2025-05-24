@@ -3,7 +3,10 @@ package View;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -13,12 +16,17 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import Controller.TransactionController;
+import Model.TransactionList;
+
 public class UI_Interface extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPanel;
 	private JTextField txtFieldAchat;
 	private JTextField txtEntrerLeMontant;
+	private TransactionController controller;
+	private TransactionList model;
 
 	public UI_Interface() {
 		setTitle("Suiveur de Budget");
@@ -26,11 +34,32 @@ public class UI_Interface extends JFrame {
 		setBounds(100, 100, 739, 472);
 		contentPanel = new JPanel();
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		JList<?> lstAchat = new JList();
+		lstAchat.setBounds(98, 143, 186, 136);
+		contentPanel.add(lstAchat);
+
+		DefaultListModel listModel = new DefaultListModel();
+		JList lstAjout = new JList(listModel);
+		lstAjout.setBounds(435, 143, 186, 136);
+		contentPanel.add(lstAjout);
+
 		setContentPane(contentPanel);
 		contentPanel.setLayout(null);
 		JButton btnAchat = new JButton("Achat");
 		btnAchat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				LocalDate timeEntered = LocalDate.now();
+
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+				String formattedString = timeEntered.format(formatter);
+
+				controller.addTransaction("Achat", Double.parseDouble(txtFieldAchat.getText()), formattedString);
+
+				txtFieldAchat.setText("");
+
+				listModel.addElement();
 
 			}
 		});
@@ -63,14 +92,6 @@ public class UI_Interface extends JFrame {
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setBounds(281, 11, 150, 31);
 		contentPanel.add(lblNewLabel);
-
-		JList<?> lstAchat = new JList();
-		lstAchat.setBounds(98, 143, 186, 136);
-		contentPanel.add(lstAchat);
-
-		JList<?> lstAjout = new JList();
-		lstAjout.setBounds(435, 143, 186, 136);
-		contentPanel.add(lstAjout);
 
 		JLabel lblBalance = new JLabel("TotalBalance :");
 		lblBalance.setFont(new Font("Times New Roman", Font.BOLD, 14));

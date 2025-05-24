@@ -1,21 +1,16 @@
 package Controller;
 
-import Model.Transaction;
-import View.UI_Interface;
+import Model.TransactionList;
 
 public class TransactionController {
-	private Transaction model;
-	private UI_Interface view;
+	private TransactionList model;
 
-	public TransactionController(Transaction model, UI_Interface view) {
+	public TransactionController(TransactionList model) {
 		this.model = model;
-		this.view = view;
 	}
 
-	public void addTransaction(String description, double amount) {
-		Transaction transaction = new Transaction(description, amount);
-
-		transactions.add(transaction);
+	public void addTransaction(String description, double amount, String timeEntered) {
+		model.addTransaction(description, amount, timeEntered);
 	}
 
 }
