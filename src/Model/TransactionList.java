@@ -8,6 +8,10 @@ public class TransactionList {
 	// changer.
 	private ArrayList<Transaction> transactions;
 
+	public TransactionList(ArrayList<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
 	public void addTransaction(String description, double amount, String timeEntered) {
 		Transaction transaction = new Transaction(description, amount, timeEntered);
 		transactions.add(transaction);

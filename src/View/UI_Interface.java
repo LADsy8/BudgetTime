@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -17,6 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import Controller.TransactionController;
+import Model.Transaction;
 import Model.TransactionList;
 
 public class UI_Interface extends JFrame {
@@ -27,22 +29,26 @@ public class UI_Interface extends JFrame {
 	private JTextField txtEntrerLeMontant;
 	private TransactionController controller;
 	private TransactionList model;
+	private ArrayList<Transaction> transactions;
 
 	public UI_Interface() {
+		transactions = new ArrayList<Transaction>();
+		model = new TransactionList(transactions);
+		controller = new TransactionController(model);
 		setTitle("Suiveur de Budget");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 739, 472);
 		contentPanel = new JPanel();
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-		JList<?> lstAchat = new JList();
-		lstAchat.setBounds(98, 143, 186, 136);
-		contentPanel.add(lstAchat);
-
-		DefaultListModel listModel = new DefaultListModel();
-		JList lstAjout = new JList(listModel);
+		JList<?> lstAjout = new JList();
 		lstAjout.setBounds(435, 143, 186, 136);
 		contentPanel.add(lstAjout);
+
+		DefaultListModel<Transaction> lstModel = new DefaultListModel<Transaction>();
+		JList<Transaction> lstAchat = new JList<Transaction>(lstModel);
+		lstAchat.setBounds(98, 143, 186, 136);
+		contentPanel.add(lstAchat);
 
 		setContentPane(contentPanel);
 		contentPanel.setLayout(null);
@@ -59,8 +65,7 @@ public class UI_Interface extends JFrame {
 
 				txtFieldAchat.setText("");
 
-				listModel.addElement();
-
+				lstModel.addAll(model.getTransactions());
 			}
 		});
 		btnAchat.setBounds(144, 63, 89, 23);
