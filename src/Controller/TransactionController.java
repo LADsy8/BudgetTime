@@ -1,5 +1,7 @@
 package Controller;
 
+import java.util.ArrayList;
+
 import Model.TransactionList;
 
 public class TransactionController {
@@ -11,6 +13,10 @@ public class TransactionController {
 
 	public void addTransaction(String description, double amount, String timeEntered) {
 		model.addTransaction(description, amount, timeEntered);
+	}
+
+	public ArrayList<String> getReadableTransactions() {
+		return model.makeTransactionsReadable();
 	}
 
 }

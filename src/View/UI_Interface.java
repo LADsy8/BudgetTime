@@ -29,11 +29,13 @@ public class UI_Interface extends JFrame {
 	private JTextField txtEntrerLeMontant;
 	private TransactionController controller;
 	private TransactionList model;
+	private ArrayList<String> readableTransactions;
 	private ArrayList<Transaction> transactions;
 
 	public UI_Interface() {
+		readableTransactions = new ArrayList<String>();
 		transactions = new ArrayList<Transaction>();
-		model = new TransactionList(transactions);
+		model = new TransactionList(readableTransactions, transactions);
 		controller = new TransactionController(model);
 		setTitle("Suiveur de Budget");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -45,29 +47,33 @@ public class UI_Interface extends JFrame {
 		lstAjout.setBounds(435, 143, 186, 136);
 		contentPanel.add(lstAjout);
 
-		DefaultListModel<Transaction> lstModel = new DefaultListModel<Transaction>();
-		JList<Transaction> lstAchat = new JList<Transaction>(lstModel);
+		DefaultListModel<String> lstModel = new DefaultListModel<String>();
+		JList<String> lstAchat = new JList<String>(lstModel);
 		lstAchat.setBounds(98, 143, 186, 136);
 		contentPanel.add(lstAchat);
 
 		setContentPane(contentPanel);
 		contentPanel.setLayout(null);
 		JButton btnAchat = new JButton("Achat");
+
+		lstModel.addAll(model.makeTransactionsReadable());
+
 		btnAchat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				LocalDate timeEntered = LocalDate.now();
+				String formattedString = timeEntered.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+				double amount = Double.parseDouble(txtFieldAchat.getText());
 
-				String formattedString = timeEntered.format(formatter);
-
-				controller.addTransaction("Achat", Double.parseDouble(txtFieldAchat.getText()), formattedString);
+				controller.addTransaction("Achat", -amount, formattedString);
 
 				txtFieldAchat.setText("");
 
-				lstModel.addAll(model.getTransactions());
+				lstModel.clear();
+				lstModel.addAll(controller.getReadableTransactions());
 			}
 		});
+
 		btnAchat.setBounds(144, 63, 89, 23);
 		contentPanel.add(btnAchat);
 

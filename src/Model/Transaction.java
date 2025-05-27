@@ -23,4 +23,9 @@ public class Transaction {
 	public String getTimeEntered() {
 		return timeEntered;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s || %.2f || %s", description, amount, timeEntered);
+	}
 }
