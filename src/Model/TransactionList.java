@@ -9,8 +9,6 @@ import java.util.Scanner;
 
 public class TransactionList {
 
-	// POur le moment, juste une liste qui est retourner à la view, mais doit être
-	// changer.
 	private ArrayList<Transaction> transactions;
 	private ArrayList<String> readableTransaction;
 
@@ -22,7 +20,7 @@ public class TransactionList {
 
 	public void addTransaction(String description, double amount, String timeEntered) {
 		Transaction transaction = new Transaction(description, amount, timeEntered);
-		transactions.add(transaction); // Add to in-memory list
+		transactions.add(transaction);
 		try (FileWriter writer = new FileWriter("BudgetDB.txt", true)) {
 			writer.write(transaction.toString() + "\n");
 			System.out.println("Successfully wrote to the file.");
@@ -39,13 +37,11 @@ public class TransactionList {
 			while (myReader.hasNextLine()) {
 				String data = myReader.nextLine().trim();
 
-				// Skip empty lines
 				if (data.isEmpty())
 					continue;
 
 				String[] separateData = data.split("\\|\\|");
 
-				// Ensure correct format
 				if (separateData.length != 3) {
 					System.out.println("Skipping malformed line: " + data);
 					continue;

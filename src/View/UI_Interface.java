@@ -54,6 +54,11 @@ public class UI_Interface extends JFrame {
 
 		setContentPane(contentPanel);
 		contentPanel.setLayout(null);
+		txtFieldAchat = new JTextField();
+		txtFieldAchat.setText("Entrer le cout de votre achat");
+		txtFieldAchat.setBounds(98, 97, 186, 20);
+		contentPanel.add(txtFieldAchat);
+		txtFieldAchat.setColumns(10);
 		JButton btnAchat = new JButton("Achat");
 
 		lstModel.addAll(model.makeTransactionsReadable());
@@ -71,6 +76,7 @@ public class UI_Interface extends JFrame {
 
 				lstModel.clear();
 				lstModel.addAll(controller.getReadableTransactions());
+
 			}
 		});
 
@@ -85,12 +91,6 @@ public class UI_Interface extends JFrame {
 		});
 		btnAjout.setBounds(486, 63, 89, 23);
 		contentPanel.add(btnAjout);
-
-		txtFieldAchat = new JTextField();
-		txtFieldAchat.setText("Entrer le cout de votre achat");
-		txtFieldAchat.setBounds(98, 97, 186, 20);
-		contentPanel.add(txtFieldAchat);
-		txtFieldAchat.setColumns(10);
 
 		txtEntrerLeMontant = new JTextField();
 		txtEntrerLeMontant.setText("Entrer le montant de votre ajout");
