@@ -1,7 +1,10 @@
 package Controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import Model.Transaction;
 import Model.TransactionList;
 
 public class TransactionController {
@@ -11,12 +14,21 @@ public class TransactionController {
 		this.model = model;
 	}
 
-	public void addTransaction(String description, double amount, String timeEntered) {
-		model.addTransaction(description, amount, timeEntered);
+	public ArrayList<String> getReadableTransactions(boolean wantAchat) {
+		return model.makeTransactionsReadable(wantAchat);
 	}
 
-	public ArrayList<String> getReadableTransactions() {
-		return model.makeTransactionsReadable();
+	public void handleAddTransaction(String text, String type) {
+		String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+		double amount = Double.parseDouble(text);
+		if (type.equalsIgnoreCase("Achat")) {
+			amount = -amount;
+		}
+		model.addTransaction(new Transaction(type, amount, date));
+	}
+
+	public void handleDeleteTransaction(String trans) {
+
 	}
 
 }

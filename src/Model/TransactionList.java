@@ -9,20 +9,17 @@ import java.util.Scanner;
 
 public class TransactionList {
 
-	private ArrayList<Transaction> transactions;
-	private ArrayList<String> readableTransaction;
+	private ArrayList<Transaction> transactions = new ArrayList<Transaction>();
+	private ArrayList<String> readableTransaction = new ArrayList<String>();
 
-	public TransactionList(ArrayList<String> readableTransaction, ArrayList<Transaction> transactions) {
-		this.readableTransaction = readableTransaction;
-		this.transactions = transactions;
+	public TransactionList() {
 		getTransactionsFromFile();
 	}
 
-	public void addTransaction(String description, double amount, String timeEntered) {
-		Transaction transaction = new Transaction(description, amount, timeEntered);
-		transactions.add(transaction);
+	public void addTransaction(Transaction trans) {
+		transactions.add(trans);
 		try (FileWriter writer = new FileWriter("BudgetDB.txt", true)) {
-			writer.write(transaction.toString() + "\n");
+			writer.write(trans.toString() + "\n");
 			System.out.println("Successfully wrote to the file.");
 		} catch (IOException e) {
 			System.out.println("An error occurred.");
@@ -30,7 +27,11 @@ public class TransactionList {
 		}
 	}
 
-	public void getTransactionsFromFile() {
+	public void deleteTransaction(String trans) {
+
+	}
+
+	private void getTransactionsFromFile() {
 		try {
 			File myObj = new File("BudgetDB.txt");
 			Scanner myReader = new Scanner(myObj);
@@ -65,15 +66,25 @@ public class TransactionList {
 		}
 	}
 
-	public ArrayList<String> makeTransactionsReadable() {
+	public ArrayList<String> makeTransactionsReadable(boolean wantAchat) {
 		readableTransaction.clear();
 		for (Transaction trans : transactions) {
-			readableTransaction.add(trans.toString());
+			if (wantAchat == true) {
+				if (trans.getAmount() < 0) {
+					readableTransaction.add(trans.toString());
+				}
+			} else if (wantAchat == false) {
+				if (trans.getAmount() > 0) {
+					readableTransaction.add(trans.toString());
+				}
+			} else {
+				readableTransaction.add(trans.toString());
+			}
 		}
 		return readableTransaction;
 	}
 
-	public double calculateTotalIncome() {
+	private double calculateTotalIncome() {
 		double totalIncome = 0;
 		for (Transaction transaction : transactions) {
 			if (transaction.getAmount() > 0) {
@@ -83,7 +94,7 @@ public class TransactionList {
 		return totalIncome;
 	}
 
-	public double calculateTotalExpenses() {
+	private double calculateTotalExpenses() {
 		double totalExpenses = 0;
 		for (Transaction transaction : transactions) {
 			if (transaction.getAmount() < 0) {
@@ -96,4 +107,5 @@ public class TransactionList {
 	public double calculateBudgetBalance() {
 		return calculateTotalIncome() - calculateTotalExpenses();
 	}
+
 }
