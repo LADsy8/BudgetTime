@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class TransactionList {
@@ -19,7 +20,7 @@ public class TransactionList {
 	public void addTransaction(Transaction trans) {
 		transactions.add(trans);
 		try (FileWriter writer = new FileWriter("BudgetDB.txt", true)) {
-			writer.write(trans.toString() + "\n");
+			writer.write(trans.toString(true) + "\n");
 			System.out.println("Successfully wrote to the file.");
 		} catch (IOException e) {
 			System.out.println("An error occurred.");
@@ -28,6 +29,11 @@ public class TransactionList {
 	}
 
 	public void deleteTransaction(String trans) {
+		for (String transToDelete : makeTransactionsReadable(null)) {
+			if (transToDelete == trans) {
+				readableTransaction.remove(transToDelete);
+			}
+		}
 
 	}
 
@@ -43,18 +49,19 @@ public class TransactionList {
 
 				String[] separateData = data.split("\\|\\|");
 
-				if (separateData.length != 3) {
+				if (separateData.length != 4) {
 					System.out.println("Skipping malformed line: " + data);
 					continue;
 				}
 
-				String description = separateData[0].trim();
-				String amountString = separateData[1].trim();
-				String time = separateData[2].trim();
+				String id = separateData[0].trim();
+				String description = separateData[1].trim();
+				String amountString = separateData[2].trim();
+				String time = separateData[3].trim();
 				amountString = amountString.replace(",", ".");
 				try {
 					double amount = Double.parseDouble(amountString);
-					transactions.add(new Transaction(description, amount, time));
+					transactions.add(new Transaction(id, description, amount, time));
 				} catch (NumberFormatException e) {
 					System.out.println("Invalid amount format, skipping transaction: " + data);
 				}
@@ -66,19 +73,19 @@ public class TransactionList {
 		}
 	}
 
-	public ArrayList<String> makeTransactionsReadable(boolean wantAchat) {
+	public ArrayList<String> makeTransactionsReadable(Optional<Boolean> wantAchat) {
 		readableTransaction.clear();
 		for (Transaction trans : transactions) {
-			if (wantAchat == true) {
+			if (wantAchat == Optional.of(true)) {
 				if (trans.getAmount() < 0) {
-					readableTransaction.add(trans.toString());
+					readableTransaction.add(trans.toString(false));
 				}
-			} else if (wantAchat == false) {
+			} else if (wantAchat == Optional.of(false)) {
 				if (trans.getAmount() > 0) {
-					readableTransaction.add(trans.toString());
+					readableTransaction.add(trans.toString(false));
 				}
-			} else {
-				readableTransaction.add(trans.toString());
+			} else if (wantAchat == null) {
+				readableTransaction.add(trans.toString(false));
 			}
 		}
 		return readableTransaction;
