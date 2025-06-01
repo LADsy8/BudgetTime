@@ -3,6 +3,8 @@ package View;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -73,8 +75,14 @@ public class UI_Interface extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				int idx = lstAchat.getSelectedIndex();
 				if (idx != -1) {
+					try {
+						controller.handleDeleteTransaction(lstAchat.getSelectedValue().toString());
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 					lstModelAchat.removeElementAt(idx);
 					lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
+
 				}
 			}
 		});
@@ -88,8 +96,8 @@ public class UI_Interface extends JFrame {
 		txtFieldAchat.setColumns(10);
 		JButton btnAchat = new JButton("Achat");
 
-		lstModelAchat.addAll(model.makeTransactionsReadable(true));
-		lstModelAjout.addAll(model.makeTransactionsReadable(false));
+		lstModelAchat.addAll(model.makeTransactionsReadable((Optional<Boolean>) Optional.ofNullable(true)));
+		lstModelAjout.addAll(model.makeTransactionsReadable((Optional<Boolean>) Optional.ofNullable(false)));
 
 		btnAchat.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -97,7 +105,7 @@ public class UI_Interface extends JFrame {
 				txtFieldAchat.setText("");
 
 				lstModelAchat.clear();
-				lstModelAchat.addAll(controller.getReadableTransactions(true));
+				lstModelAchat.addAll(controller.getReadableTransactions((Optional<Boolean>) Optional.ofNullable(true)));
 
 				lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
 
@@ -115,7 +123,7 @@ public class UI_Interface extends JFrame {
 				txtFieldAjout.setText("");
 
 				lstModelAjout.clear();
-				lstModelAjout.addAll(controller.getReadableTransactions(false));
+				lstModelAjout.addAll(controller.getReadableTransactions((Optional<Boolean>) Optional.ofNullable(true)));
 				lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
 			}
 		});

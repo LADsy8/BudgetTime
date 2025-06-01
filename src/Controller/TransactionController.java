@@ -1,8 +1,10 @@
 package Controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import Model.Transaction;
@@ -15,7 +17,7 @@ public class TransactionController {
 		this.model = model;
 	}
 
-	public ArrayList<String> getReadableTransactions(boolean wantAchat) {
+	public ArrayList<String> getReadableTransactions(Optional<Boolean> wantAchat) {
 		return model.makeTransactionsReadable(wantAchat);
 	}
 
@@ -29,7 +31,7 @@ public class TransactionController {
 		model.addTransaction(new Transaction(id, type, amount, date));
 	}
 
-	public void handleDeleteTransaction(String trans) {
+	public void handleDeleteTransaction(String trans) throws IOException {
 		model.deleteTransaction(trans);
 	}
 

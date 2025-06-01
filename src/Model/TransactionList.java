@@ -1,7 +1,10 @@
 package Model;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,20 +24,33 @@ public class TransactionList {
 		transactions.add(trans);
 		try (FileWriter writer = new FileWriter("BudgetDB.txt", true)) {
 			writer.write(trans.toString(true) + "\n");
-			System.out.println("Successfully wrote to the file.");
+			System.out.println("La transaction a été ajoutée à la BD.");
 		} catch (IOException e) {
-			System.out.println("An error occurred.");
+			System.out.println("Une exceptions à été levée, empenchant la transactions d'être ajouté.");
 			e.printStackTrace();
 		}
 	}
 
-	public void deleteTransaction(String trans) {
-		for (String transToDelete : makeTransactionsReadable(null)) {
-			if (transToDelete == trans) {
-				readableTransaction.remove(transToDelete);
-			}
-		}
+	public void deleteTransaction(String trans) throws IOException {
 
+		File actual = new File("BudgetDB.txt");
+		BufferedReader reader = new BufferedReader(new FileReader("BudgetDB.txt"));
+		File temp = new File("temp.txt");
+		BufferedWriter bw = new BufferedWriter(new FileWriter(temp, true));
+		String removeID = trans;
+		String currentLine;
+		while ((currentLine = reader.readLine()) != null) {
+			String trimmedLine = currentLine.trim();
+			if (trimmedLine.equals(removeID)) {
+				currentLine = "";
+			}
+			bw.write(currentLine + System.getProperty("line.separator"));
+
+		}
+		reader.close();
+		bw.close();
+		boolean delete = actual.delete();
+		boolean b = temp.renameTo(actual);
 	}
 
 	private void getTransactionsFromFile() {
@@ -50,7 +66,8 @@ public class TransactionList {
 				String[] separateData = data.split("\\|\\|");
 
 				if (separateData.length != 4) {
-					System.out.println("Skipping malformed line: " + data);
+					System.out.println("La ligne contenant: " + data
+							+ " à été sautée, car elle ne contient pas tout l'information demandé.");
 					continue;
 				}
 
@@ -63,12 +80,14 @@ public class TransactionList {
 					double amount = Double.parseDouble(amountString);
 					transactions.add(new Transaction(id, description, amount, time));
 				} catch (NumberFormatException e) {
-					System.out.println("Invalid amount format, skipping transaction: " + data);
+					System.out.println(
+							"Le montant pris dans la base de donné ne peux pas être convertie en Double: " + data);
 				}
+
 			}
 			myReader.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("An error occurred.");
+			System.out.println("Une erreur a été levée lors de l'accès au donné de l'application. ");
 			e.printStackTrace();
 		}
 	}
