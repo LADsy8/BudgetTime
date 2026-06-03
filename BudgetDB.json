@@ -1,8 +1,2 @@
 [
-  {"id":"9b536720-2608-43a1-9d35-6ae797537afb","description":"Ajout","amount":123.0,"timeEntered":"31-05-2025"},
-  {"id":"db61ad16-dd97-46a1-a4e2-dac05c4ca3c1","description":"Ajout","amount":1234.0,"timeEntered":"31-05-2025"},
-  {"id":"320558ae-b324-4c90-9fbb-a0ff3254244c","description":"Revenu","amount":555.0,"timeEntered":"03-06-2026"},
-  {"id":"9810e73b-79ac-40c3-a902-b6b23048228a","description":"Dépense","amount":1234.0,"timeEntered":"03-06-2026"},
-  {"id":"f21b24d7-a90b-4178-ab47-72d17b2dda0b","description":"Revenu","amount":6666.0,"timeEntered":"03-06-2026"},
-  {"id":"6f182a31-043f-457b-92b3-ff153a42b92f","description":"Dépense","amount":-2222.0,"timeEntered":"03-06-2026"}
 ]

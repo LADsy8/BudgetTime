@@ -291,9 +291,34 @@ public class UI_Interface extends JFrame {
 		balanceValue.setText(formatMoney(controller.getBalance()));
 	}
 
+	public List<String> getExpenseDisplayItems() {
+		return modelSnapshot(expensesModel);
+	}
+
+	public List<String> getIncomeDisplayItems() {
+		return modelSnapshot(incomesModel);
+	}
+
+	public String getBalanceText() {
+		return balanceValue.getText();
+	}
+
+	private List<String> modelSnapshot(DefaultListModel<String> model) {
+		List<String> snapshot = new java.util.ArrayList<String>();
+		for (int i = 0; i < model.size(); i++) {
+			snapshot.add(model.getElementAt(i));
+		}
+		return snapshot;
+	}
+
 	private String formatTransaction(Transaction transaction) {
-		return transaction.getId() + " || " + transaction.getDescription() + " || "
-				+ formatMoney(transaction.getAmount()) + " || " + transaction.getTimeEntered();
+		String typeLabel = transaction.getType().name().equals("INCOME") ? "Revenu" : "Dépense";
+		return "<html><div style='padding:6px 4px;'>"
+				+ "<div><b>" + typeLabel + "</b> - " + escapeHtml(transaction.getDescription()) + "</div>"
+				+ "<div style='color:#5A606E; font-size:11px;'>"
+				+ formatMoney(transaction.getAmount()) + " • " + escapeHtml(transaction.getTimeEntered())
+				+ " • " + escapeHtml(transaction.getId())
+				+ "</div></div></html>";
 	}
 
 	private String formatMoney(double amount) {
@@ -301,8 +326,19 @@ public class UI_Interface extends JFrame {
 	}
 
 	private String extractId(String displayedTransaction) {
+		if (displayedTransaction != null && displayedTransaction.startsWith("<html>")) {
+			int markerIndex = displayedTransaction.lastIndexOf("•");
+			if (markerIndex >= 0) {
+				String tail = displayedTransaction.substring(markerIndex + 1).replace("</div></div></html>", "").trim();
+				return tail;
+			}
+		}
 		String[] parts = displayedTransaction.split("\\|\\|");
 		return parts.length > 0 ? parts[0].trim() : displayedTransaction.trim();
+	}
+
+	private String escapeHtml(String value) {
+		return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 	}
 
 	private static class TransactionRenderer extends DefaultListCellRenderer {
