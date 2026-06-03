@@ -1,11 +1,22 @@
 package View;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -13,7 +24,9 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -26,123 +39,281 @@ import Model.TransactionType;
 public class UI_Interface extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPanel;
-	private JTextField txtFieldAchat;
-	private JTextField txtFieldAjout;
+	private static final Color BG = new Color(245, 247, 250);
+	private static final Color PANEL = Color.WHITE;
+	private static final Color PRIMARY = new Color(42, 92, 170);
+	private static final Color SUCCESS = new Color(31, 122, 70);
+	private static final Color DANGER = new Color(176, 58, 46);
+	private static final DecimalFormat MONEY = new DecimalFormat("#,##0.00");
+
 	private final TransactionController controller;
+	private final DefaultListModel<String> expensesModel = new DefaultListModel<String>();
+	private final DefaultListModel<String> incomesModel = new DefaultListModel<String>();
+	private final JLabel balanceValue = new JLabel();
+	private final JLabel statusLabel = new JLabel(" ");
+	private final JTextField expenseField = new JTextField();
+	private final JTextField incomeField = new JTextField();
 
 	public UI_Interface(TransactionController controller) {
 		this.controller = controller;
 
-		JLabel lblBalance = new JLabel();
-		setTitle("Suiveur de Budget");
+		setTitle("BudgetTime");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 739, 472);
-		contentPanel = new JPanel();
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPanel);
-		contentPanel.setLayout(null);
+		setMinimumSize(new Dimension(920, 620));
+		setLocationRelativeTo(null);
 
-		DefaultListModel<String> lstModelAjout = new DefaultListModel<String>();
-		JList<String> lstAjout = new JList<String>(lstModelAjout);
-		lstAjout.setBounds(435, 143, 186, 136);
-		contentPanel.add(lstAjout);
+		JPanel root = new JPanel(new BorderLayout(16, 16));
+		root.setBorder(new EmptyBorder(18, 18, 18, 18));
+		root.setBackground(BG);
+		setContentPane(root);
 
-		DefaultListModel<String> lstModelAchat = new DefaultListModel<String>();
-		JList<String> lstAchat = new JList<String>(lstModelAchat);
-		lstAchat.setBounds(98, 143, 186, 136);
-		contentPanel.add(lstAchat);
+		root.add(buildHeader(), BorderLayout.NORTH);
+		root.add(buildCenter(), BorderLayout.CENTER);
+		root.add(buildFooter(), BorderLayout.SOUTH);
 
-		InputMap imAjout = lstAjout.getInputMap(JComponent.WHEN_FOCUSED);
-		imAjout.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteAjout");
-		ActionMap amAjout = lstAjout.getActionMap();
-		amAjout.put("deleteAjout", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String selected = lstAjout.getSelectedValue();
-				if (selected != null) {
-					controller.handleDeleteTransaction(extractId(selected));
-					refreshLists(lstModelAchat, lstModelAjout, lblBalance);
-				}
-			}
-		});
-
-		InputMap imAchat = lstAchat.getInputMap(JComponent.WHEN_FOCUSED);
-		imAchat.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteAchat");
-		ActionMap amAchat = lstAchat.getActionMap();
-		amAchat.put("deleteAchat", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String selected = lstAchat.getSelectedValue();
-				if (selected != null) {
-					controller.handleDeleteTransaction(extractId(selected));
-					refreshLists(lstModelAchat, lstModelAjout, lblBalance);
-				}
-			}
-		});
-
-		txtFieldAchat = new JTextField();
-		txtFieldAchat.setText("Entrer le cout de votre achat");
-		txtFieldAchat.setBounds(98, 97, 186, 20);
-		txtFieldAchat.setColumns(10);
-		contentPanel.add(txtFieldAchat);
-
-		JButton btnAchat = new JButton("Achat");
-		btnAchat.setBounds(144, 63, 89, 23);
-		btnAchat.addActionListener(e -> {
-			controller.handleAddTransaction(txtFieldAchat.getText(), "Achat", TransactionType.EXPENSE);
-			txtFieldAchat.setText("");
-			refreshLists(lstModelAchat, lstModelAjout, lblBalance);
-		});
-		contentPanel.add(btnAchat);
-
-		txtFieldAjout = new JTextField();
-		txtFieldAjout.setText("Entrer le montant de votre ajout");
-		txtFieldAjout.setColumns(10);
-		txtFieldAjout.setBounds(435, 97, 186, 20);
-		contentPanel.add(txtFieldAjout);
-
-		JButton btnAjout = new JButton("Ajout");
-		btnAjout.setBounds(486, 63, 89, 23);
-		btnAjout.addActionListener(e -> {
-			controller.handleAddTransaction(txtFieldAjout.getText(), "Ajout", TransactionType.INCOME);
-			txtFieldAjout.setText("");
-			refreshLists(lstModelAchat, lstModelAjout, lblBalance);
-		});
-		contentPanel.add(btnAjout);
-
-		JLabel lblNewLabel = new JLabel("Application De Budget");
-		lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 13));
-		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(281, 11, 150, 31);
-		contentPanel.add(lblNewLabel);
-
-		lblBalance.setFont(new Font("Times New Roman", Font.BOLD, 14));
-		lblBalance.setBounds(281, 316, 220, 20);
-		contentPanel.add(lblBalance);
-
-		refreshLists(lstModelAchat, lstModelAjout, lblBalance);
+		refreshAll();
 	}
 
-	private void refreshLists(DefaultListModel<String> expensesModel, DefaultListModel<String> incomesModel, JLabel balanceLabel) {
+	private JPanel buildHeader() {
+		JPanel header = new JPanel();
+		header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+		header.setOpaque(false);
+
+		JLabel title = new JLabel("BudgetTime");
+		title.setFont(new Font("Segoe UI", Font.BOLD, 28));
+		title.setAlignmentX(LEFT_ALIGNMENT);
+
+		JLabel subtitle = new JLabel("Suivi des dépenses et revenus");
+		subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		subtitle.setForeground(new Color(90, 96, 110));
+		subtitle.setAlignmentX(LEFT_ALIGNMENT);
+
+		JPanel balanceCard = new JPanel(new BorderLayout());
+		balanceCard.setBackground(PRIMARY);
+		balanceCard.setBorder(BorderFactory.createEmptyBorder(16, 18, 16, 18));
+		balanceCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
+
+		JLabel balanceLabel = new JLabel("Solde actuel");
+		balanceLabel.setForeground(Color.WHITE);
+		balanceLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+
+		balanceValue.setForeground(Color.WHITE);
+		balanceValue.setFont(new Font("Segoe UI", Font.BOLD, 28));
+		balanceValue.setHorizontalAlignment(SwingConstants.RIGHT);
+
+		balanceCard.add(balanceLabel, BorderLayout.WEST);
+		balanceCard.add(balanceValue, BorderLayout.EAST);
+
+		header.add(title);
+		header.add(Box.createVerticalStrut(4));
+		header.add(subtitle);
+		header.add(Box.createVerticalStrut(16));
+		header.add(balanceCard);
+
+		return header;
+	}
+
+	private JPanel buildCenter() {
+		JPanel center = new JPanel(new GridBagLayout());
+		center.setOpaque(false);
+
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(0, 0, 0, 16);
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		center.add(buildTransactionPanel("Ajouter une dépense", "Dépense", expenseField, DANGER,
+				TransactionType.EXPENSE, expensesModel, true), gbc);
+
+		gbc.gridx = 1;
+		gbc.insets = new Insets(0, 0, 0, 0);
+		center.add(buildTransactionPanel("Ajouter un revenu", "Revenu", incomeField, SUCCESS, TransactionType.INCOME,
+				incomesModel, false), gbc);
+
+		return center;
+	}
+
+	private JPanel buildTransactionPanel(String titleText, String buttonText, JTextField field, Color accent,
+			TransactionType type, DefaultListModel<String> model, boolean expensePanel) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout(0, 12));
+		panel.setBackground(PANEL);
+		panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(225, 230, 238)),
+				BorderFactory.createEmptyBorder(16, 16, 16, 16)));
+
+		JLabel title = new JLabel(titleText);
+		title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+		panel.add(title, BorderLayout.NORTH);
+
+		JPanel form = new JPanel(new GridBagLayout());
+		form.setOpaque(false);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		gbc.insets = new Insets(0, 0, 10, 0);
+
+		field.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		field.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(210, 216, 226)),
+				BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+		field.setText("Montant");
+		field.setForeground(new Color(130, 130, 130));
+		field.addFocusListener(new java.awt.event.FocusAdapter() {
+			@Override
+			public void focusGained(java.awt.event.FocusEvent e) {
+				if ("Montant".equals(field.getText())) {
+					field.setText("");
+					field.setForeground(Color.DARK_GRAY);
+				}
+			}
+
+			@Override
+			public void focusLost(java.awt.event.FocusEvent e) {
+				if (field.getText().trim().isEmpty()) {
+					field.setText("Montant");
+					field.setForeground(new Color(130, 130, 130));
+				}
+			}
+		});
+		form.add(field, gbc);
+
+		JButton addButton = new JButton(buttonText);
+		addButton.setBackground(accent);
+		addButton.setForeground(Color.WHITE);
+		addButton.setFocusPainted(false);
+		addButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+		addButton.setBorder(BorderFactory.createEmptyBorder(10, 14, 10, 14));
+		addButton.addActionListener(e -> submitTransaction(field, type, model, expensePanel ? "dépense" : "revenu"));
+
+		gbc.gridy = 1;
+		gbc.gridwidth = 1;
+		gbc.insets = new Insets(0, 0, 0, 8);
+		gbc.weightx = 0.0;
+		form.add(addButton, gbc);
+
+		JButton clearButton = new JButton("Effacer");
+		clearButton.setFocusPainted(false);
+		clearButton.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+		clearButton.addActionListener(e -> field.setText("Montant"));
+
+		gbc.gridx = 1;
+		gbc.insets = new Insets(0, 8, 0, 0);
+		form.add(clearButton, gbc);
+
+		panel.add(form, BorderLayout.NORTH);
+
+		JList<String> list = new JList<String>(model);
+		list.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		list.setSelectionBackground(new Color(220, 233, 255));
+		list.setSelectionForeground(Color.DARK_GRAY);
+		list.setCellRenderer(new TransactionRenderer());
+
+		JScrollPane scrollPane = new JScrollPane(list);
+		scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 230, 238)));
+		panel.add(scrollPane, BorderLayout.CENTER);
+
+		InputMap inputMap = list.getInputMap(JComponent.WHEN_FOCUSED);
+		inputMap.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteTransaction");
+		ActionMap actionMap = list.getActionMap();
+		actionMap.put("deleteTransaction", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String selected = list.getSelectedValue();
+				if (selected != null) {
+					controller.handleDeleteTransaction(extractId(selected));
+					refreshAll();
+					statusLabel.setText("Transaction supprimée.");
+				}
+			}
+		});
+
+		return panel;
+	}
+
+	private JPanel buildFooter() {
+		JPanel footer = new JPanel(new BorderLayout(8, 8));
+		footer.setOpaque(false);
+
+		statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		statusLabel.setForeground(new Color(90, 96, 110));
+		footer.add(statusLabel, BorderLayout.WEST);
+
+		JLabel hint = new JLabel("Astuce: sélectionne une transaction puis appuie sur Backspace pour la supprimer");
+		hint.setFont(new Font("Segoe UI", Font.ITALIC, 12));
+		hint.setForeground(new Color(120, 120, 120));
+		footer.add(hint, BorderLayout.EAST);
+
+		return footer;
+	}
+
+	private void submitTransaction(JTextField field, TransactionType type, DefaultListModel<String> model,
+			String label) {
+		String value = field.getText().trim();
+		if (value.isEmpty() || "Montant".equals(value)) {
+			statusLabel.setText("Entre un montant valide pour la " + label + ".");
+			return;
+		}
+
+		try {
+			double parsed = Double.parseDouble(value);
+			if (parsed <= 0) {
+				statusLabel.setText("Le montant doit être supérieur à 0.");
+				return;
+			}
+			controller.handleAddTransaction(value, type == TransactionType.EXPENSE ? "Dépense" : "Revenu", type);
+			field.setText("Montant");
+			refreshAll();
+			statusLabel.setText("Transaction ajoutée.");
+		} catch (NumberFormatException ex) {
+			JOptionPane.showMessageDialog(this, "Le montant doit être un nombre valide.", "Erreur de saisie",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	private void refreshAll() {
 		expensesModel.clear();
 		incomesModel.clear();
 
 		List<Transaction> expenses = controller.getTransactions(TransactionType.EXPENSE);
 		for (Transaction transaction : expenses) {
-			expensesModel.addElement(transaction.toString(true));
+			expensesModel.addElement(formatTransaction(transaction));
 		}
 
 		List<Transaction> incomes = controller.getTransactions(TransactionType.INCOME);
 		for (Transaction transaction : incomes) {
-			incomesModel.addElement(transaction.toString(true));
+			incomesModel.addElement(formatTransaction(transaction));
 		}
 
-		balanceLabel.setText("Total Balance: " + controller.getBalance());
+		balanceValue.setText(formatMoney(controller.getBalance()));
+	}
+
+	private String formatTransaction(Transaction transaction) {
+		return transaction.getId() + " || " + transaction.getDescription() + " || "
+				+ formatMoney(transaction.getAmount()) + " || " + transaction.getTimeEntered();
+	}
+
+	private String formatMoney(double amount) {
+		return MONEY.format(amount) + " $";
 	}
 
 	private String extractId(String displayedTransaction) {
 		String[] parts = displayedTransaction.split("\\|\\|");
 		return parts.length > 0 ? parts[0].trim() : displayedTransaction.trim();
+	}
+
+	private static class TransactionRenderer extends DefaultListCellRenderer {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index,
+				boolean isSelected, boolean cellHasFocus) {
+			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			label.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+			return label;
+		}
 	}
 }
