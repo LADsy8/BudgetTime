@@ -2,9 +2,7 @@ package View;
 
 import java.awt.Font;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Optional;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -22,7 +20,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import Controller.TransactionController;
-import Model.TransactionList;
+import Model.Transaction;
+import Model.TransactionType;
 
 public class UI_Interface extends JFrame {
 
@@ -30,111 +29,87 @@ public class UI_Interface extends JFrame {
 	private JPanel contentPanel;
 	private JTextField txtFieldAchat;
 	private JTextField txtFieldAjout;
-	private TransactionController controller;
-	private TransactionList model;
+	private final TransactionController controller;
 
-	public UI_Interface() {
-		model = new TransactionList();
-		controller = new TransactionController(model);
+	public UI_Interface(TransactionController controller) {
+		this.controller = controller;
+
 		JLabel lblBalance = new JLabel();
 		setTitle("Suiveur de Budget");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 739, 472);
 		contentPanel = new JPanel();
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPanel);
+		contentPanel.setLayout(null);
 
 		DefaultListModel<String> lstModelAjout = new DefaultListModel<String>();
 		JList<String> lstAjout = new JList<String>(lstModelAjout);
 		lstAjout.setBounds(435, 143, 186, 136);
 		contentPanel.add(lstAjout);
+
+		DefaultListModel<String> lstModelAchat = new DefaultListModel<String>();
+		JList<String> lstAchat = new JList<String>(lstModelAchat);
+		lstAchat.setBounds(98, 143, 186, 136);
+		contentPanel.add(lstAchat);
+
 		InputMap imAjout = lstAjout.getInputMap(JComponent.WHEN_FOCUSED);
 		imAjout.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteAjout");
 		ActionMap amAjout = lstAjout.getActionMap();
 		amAjout.put("deleteAjout", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int idx = lstAjout.getSelectedIndex();
-				if (idx != -1) {
-					String badTransaction = lstModelAjout.getElementAt(idx);
-					lstModelAjout.removeElementAt(idx);
-					lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
-
+				String selected = lstAjout.getSelectedValue();
+				if (selected != null) {
+					controller.handleDeleteTransaction(extractId(selected));
+					refreshLists(lstModelAchat, lstModelAjout, lblBalance);
 				}
 			}
 		});
 
-		DefaultListModel<String> lstModelAchat = new DefaultListModel<String>();
-		JList<String> lstAchat = new JList<String>(lstModelAchat);
-		lstAchat.setBounds(98, 143, 186, 136);
-		contentPanel.add(lstAchat);
 		InputMap imAchat = lstAchat.getInputMap(JComponent.WHEN_FOCUSED);
 		imAchat.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteAchat");
 		ActionMap amAchat = lstAchat.getActionMap();
 		amAchat.put("deleteAchat", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int idx = lstAchat.getSelectedIndex();
-				if (idx != -1) {
-					try {
-						controller.handleDeleteTransaction(lstAchat.getSelectedValue().toString());
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-					lstModelAchat.removeElementAt(idx);
-					lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
-
+				String selected = lstAchat.getSelectedValue();
+				if (selected != null) {
+					controller.handleDeleteTransaction(extractId(selected));
+					refreshLists(lstModelAchat, lstModelAjout, lblBalance);
 				}
 			}
 		});
 
-		setContentPane(contentPanel);
-		contentPanel.setLayout(null);
 		txtFieldAchat = new JTextField();
 		txtFieldAchat.setText("Entrer le cout de votre achat");
 		txtFieldAchat.setBounds(98, 97, 186, 20);
-		contentPanel.add(txtFieldAchat);
 		txtFieldAchat.setColumns(10);
+		contentPanel.add(txtFieldAchat);
+
 		JButton btnAchat = new JButton("Achat");
-
-		lstModelAchat.addAll(model.makeTransactionsReadable((Optional<Boolean>) Optional.ofNullable(true)));
-		lstModelAjout.addAll(model.makeTransactionsReadable((Optional<Boolean>) Optional.ofNullable(false)));
-
-		btnAchat.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.handleAddTransaction(txtFieldAchat.getText(), "Achat");
-				txtFieldAchat.setText("");
-
-				lstModelAchat.clear();
-				lstModelAchat.addAll(controller.getReadableTransactions((Optional<Boolean>) Optional.ofNullable(true)));
-
-				lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
-
-			}
-		});
-
 		btnAchat.setBounds(144, 63, 89, 23);
-		contentPanel.add(btnAchat);
-
-		JButton btnAjout = new JButton("Ajout");
-		btnAjout.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				controller.handleAddTransaction(txtFieldAjout.getText(), "Ajout");
-
-				txtFieldAjout.setText("");
-
-				lstModelAjout.clear();
-				lstModelAjout.addAll(controller.getReadableTransactions((Optional<Boolean>) Optional.ofNullable(true)));
-				lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
-			}
+		btnAchat.addActionListener(e -> {
+			controller.handleAddTransaction(txtFieldAchat.getText(), "Achat", TransactionType.EXPENSE);
+			txtFieldAchat.setText("");
+			refreshLists(lstModelAchat, lstModelAjout, lblBalance);
 		});
-		btnAjout.setBounds(486, 63, 89, 23);
-		contentPanel.add(btnAjout);
+		contentPanel.add(btnAchat);
 
 		txtFieldAjout = new JTextField();
 		txtFieldAjout.setText("Entrer le montant de votre ajout");
 		txtFieldAjout.setColumns(10);
 		txtFieldAjout.setBounds(435, 97, 186, 20);
 		contentPanel.add(txtFieldAjout);
+
+		JButton btnAjout = new JButton("Ajout");
+		btnAjout.setBounds(486, 63, 89, 23);
+		btnAjout.addActionListener(e -> {
+			controller.handleAddTransaction(txtFieldAjout.getText(), "Ajout", TransactionType.INCOME);
+			txtFieldAjout.setText("");
+			refreshLists(lstModelAchat, lstModelAjout, lblBalance);
+		});
+		contentPanel.add(btnAjout);
 
 		JLabel lblNewLabel = new JLabel("Application De Budget");
 		lblNewLabel.setFont(new Font("Times New Roman", Font.BOLD | Font.ITALIC, 13));
@@ -143,8 +118,31 @@ public class UI_Interface extends JFrame {
 		contentPanel.add(lblNewLabel);
 
 		lblBalance.setFont(new Font("Times New Roman", Font.BOLD, 14));
-		lblBalance.setBounds(281, 316, 150, 20);
+		lblBalance.setBounds(281, 316, 220, 20);
 		contentPanel.add(lblBalance);
-		lblBalance.setText("Total Balance: " + model.calculateBudgetBalance());
+
+		refreshLists(lstModelAchat, lstModelAjout, lblBalance);
+	}
+
+	private void refreshLists(DefaultListModel<String> expensesModel, DefaultListModel<String> incomesModel, JLabel balanceLabel) {
+		expensesModel.clear();
+		incomesModel.clear();
+
+		List<Transaction> expenses = controller.getTransactions(TransactionType.EXPENSE);
+		for (Transaction transaction : expenses) {
+			expensesModel.addElement(transaction.toString(true));
+		}
+
+		List<Transaction> incomes = controller.getTransactions(TransactionType.INCOME);
+		for (Transaction transaction : incomes) {
+			incomesModel.addElement(transaction.toString(true));
+		}
+
+		balanceLabel.setText("Total Balance: " + controller.getBalance());
+	}
+
+	private String extractId(String displayedTransaction) {
+		String[] parts = displayedTransaction.split("\\|\\|");
+		return parts.length > 0 ? parts[0].trim() : displayedTransaction.trim();
 	}
 }

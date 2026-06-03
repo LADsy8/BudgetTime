@@ -1,38 +1,35 @@
 package Controller;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 import Model.Transaction;
-import Model.TransactionList;
+import Model.TransactionType;
+import Service.BudgetService;
 
 public class TransactionController {
-	private TransactionList model;
+	private final BudgetService service;
 
-	public TransactionController(TransactionList model) {
-		this.model = model;
+	public TransactionController(BudgetService service) {
+		this.service = service;
 	}
 
-	public ArrayList<String> getReadableTransactions(Optional<Boolean> wantAchat) {
-		return model.makeTransactionsReadable(wantAchat);
-	}
-
-	public void handleAddTransaction(String text, String type) {
-		String id = String.valueOf(UUID.randomUUID());
-		String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-		double amount = Double.parseDouble(text);
-		if (type.equalsIgnoreCase("Achat")) {
-			amount = -amount;
+	public List<Transaction> getTransactions(TransactionType type) {
+		if (type == null) {
+			return service.getAllTransactions();
 		}
-		model.addTransaction(new Transaction(id, type, amount, date));
+		return service.getTransactionsByType(type);
 	}
 
-	public void handleDeleteTransaction(String trans) throws IOException {
-		model.deleteTransaction(trans);
+	public void handleAddTransaction(String text, String description, TransactionType type) {
+		double amount = Double.parseDouble(text);
+		service.addTransaction(description, amount, type);
 	}
 
+	public void handleDeleteTransaction(String id) {
+		service.deleteTransaction(id);
+	}
+
+	public double getBalance() {
+		return service.calculateBalance();
+	}
 }

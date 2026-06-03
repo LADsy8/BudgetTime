@@ -2,10 +2,10 @@ package Model;
 
 public class Transaction {
 
-	private String description;
-	private double amount;
-	private String timeEntered;
-	private String id;
+	private final String description;
+	private final double amount;
+	private final String timeEntered;
+	private final String id;
 
 	public Transaction(String id, String description, double amount, String timeEntered) {
 		this.description = description;
@@ -28,6 +28,25 @@ public class Transaction {
 
 	public String getId() {
 		return id;
+	}
+
+	public boolean isIncome() {
+		return amount > 0;
+	}
+
+	public String toJson() {
+		return new StringBuilder()
+				.append("{")
+				.append("\"id\":\"").append(escapeJson(id)).append("\",")
+				.append("\"description\":\"").append(escapeJson(description)).append("\",")
+				.append("\"amount\":").append(amount).append(",")
+				.append("\"timeEntered\":\"").append(escapeJson(timeEntered)).append("\"")
+				.append("}")
+				.toString();
+	}
+
+	private String escapeJson(String value) {
+		return value == null ? "" : value.replace("\\", "\\\\").replace("\"", "\\\"");
 	}
 
 	public String toString(boolean forFile) {
