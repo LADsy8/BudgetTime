@@ -8,6 +8,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -21,12 +23,14 @@ import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
@@ -216,6 +220,18 @@ public class UI_Interface extends JFrame {
 		scrollPane.setBorder(BorderFactory.createLineBorder(new Color(225, 230, 238)));
 		panel.add(scrollPane, BorderLayout.CENTER);
 
+		list.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 1) {
+					String selected = list.getSelectedValue();
+					if (selected != null) {
+						showTransactionDetails(selected);
+					}
+				}
+			}
+		});
+
 		InputMap inputMap = list.getInputMap(JComponent.WHEN_FOCUSED);
 		inputMap.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteTransaction");
 		ActionMap actionMap = list.getActionMap();
@@ -313,12 +329,15 @@ public class UI_Interface extends JFrame {
 
 	private String formatTransaction(Transaction transaction) {
 		String typeLabel = transaction.getType().name().equals("INCOME") ? "Revenu" : "Dépense";
-		return "<html><div style='padding:6px 4px;'>"
-				+ "<div><b>" + typeLabel + "</b> - " + escapeHtml(transaction.getDescription()) + "</div>"
-				+ "<div style='color:#5A606E; font-size:11px;'>"
-				+ formatMoney(transaction.getAmount()) + " • " + escapeHtml(transaction.getTimeEntered())
-				+ " • " + escapeHtml(transaction.getId())
-				+ "</div></div></html>";
+		return "<html><div style='padding:6px 4px;'>" + "<div><b>" + typeLabel + "</b> " + "</div>" // ajout plus tard
+																									// d'un moyen
+																									// d'afficher
+																									// les types de
+																									// dépense ou de
+																									// revenue
+																									// possible
+				+ "<div style='color:#5A606E; font-size:11px;'>" + formatMoney(transaction.getAmount()) + " • "
+				+ escapeHtml(transaction.getTimeEntered()) + "</div></div></html>";
 	}
 
 	private String formatMoney(double amount) {
@@ -335,6 +354,62 @@ public class UI_Interface extends JFrame {
 		}
 		String[] parts = displayedTransaction.split("\\|\\|");
 		return parts.length > 0 ? parts[0].trim() : displayedTransaction.trim();
+	}
+
+	private void showTransactionDetails(String displayedTransaction) {
+		String id = extractId(displayedTransaction);
+		Transaction selectedTransaction = null;
+		List<Transaction> transactions = controller.getTransactions(null);
+		for (Transaction transaction : transactions) {
+			if (transaction.getId().equals(id)) {
+				selectedTransaction = transaction;
+				break;
+			}
+		}
+
+		JDialog dialog = new JDialog(this, "Détails de la transaction", true);
+		dialog.setSize(420, 280);
+		dialog.setLocationRelativeTo(this);
+		dialog.setLayout(new BorderLayout(12, 12));
+
+		JPanel content = new JPanel();
+		content.setBorder(new EmptyBorder(16, 16, 16, 16));
+		content.setBackground(Color.WHITE);
+		content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+
+		JLabel title = new JLabel("Transaction sélectionnée");
+		title.setFont(new Font("Segoe UI", Font.BOLD, 18));
+
+		JTextArea details = new JTextArea();
+		details.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+		details.setEditable(false);
+		details.setOpaque(false);
+		details.setLineWrap(true);
+		details.setWrapStyleWord(true);
+		details.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(225, 230, 238)),
+				BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
+		if (selectedTransaction != null) {
+			details.setText(
+					"ID: " + selectedTransaction.getId() + "\n" + "Type: " + selectedTransaction.getType().name() + "\n"
+							+ "Description: " + selectedTransaction.getDescription() + "\n" + "Montant: "
+							+ formatMoney(selectedTransaction.getAmount()) + "\n" + "Date: "
+							+ selectedTransaction.getTimeEntered());
+		} else {
+			details.setText("Impossible de trouver les détails de cette transaction.");
+		}
+
+		JButton closeButton = new JButton("Fermer");
+		closeButton.addActionListener(e -> dialog.dispose());
+
+		content.add(title);
+		content.add(Box.createVerticalStrut(12));
+		content.add(details);
+		content.add(Box.createVerticalStrut(16));
+		content.add(closeButton);
+
+		dialog.add(content, BorderLayout.CENTER);
+		dialog.setVisible(true);
 	}
 
 	private String escapeHtml(String value) {
