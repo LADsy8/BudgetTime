@@ -51,8 +51,8 @@ public class UI_Interface extends JFrame {
 	private static final DecimalFormat MONEY = new DecimalFormat("#,##0.00");
 
 	private final TransactionController controller;
-	private final DefaultListModel<String> expensesModel = new DefaultListModel<String>();
-	private final DefaultListModel<String> incomesModel = new DefaultListModel<String>();
+	private final DefaultListModel<Transaction> expensesModel = new DefaultListModel<Transaction>();
+	private final DefaultListModel<Transaction> incomesModel = new DefaultListModel<Transaction>();
 	private final JLabel balanceValue = new JLabel();
 	private final JLabel statusLabel = new JLabel(" ");
 	private final JTextField expenseField = new JTextField();
@@ -140,7 +140,7 @@ public class UI_Interface extends JFrame {
 	}
 
 	private JPanel buildTransactionPanel(String titleText, String buttonText, JTextField field, Color accent,
-			TransactionType type, DefaultListModel<String> model, boolean expensePanel) {
+			TransactionType type, DefaultListModel<Transaction> model, boolean expensePanel) {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout(0, 12));
 		panel.setBackground(PANEL);
@@ -236,11 +236,13 @@ public class UI_Interface extends JFrame {
 		inputMap.put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteTransaction");
 		ActionMap actionMap = list.getActionMap();
 		actionMap.put("deleteTransaction", new AbstractAction() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String selected = list.getSelectedValue();
+				Transaction selected = list.getSelectedValue();
 				if (selected != null) {
-					controller.handleDeleteTransaction(extractId(selected));
+					controller.handleDeleteTransaction(selected.getId());
 					refreshAll();
 					statusLabel.setText("Transaction supprimée.");
 				}
@@ -266,7 +268,7 @@ public class UI_Interface extends JFrame {
 		return footer;
 	}
 
-	private void submitTransaction(JTextField field, TransactionType type, DefaultListModel<String> model,
+	private void submitTransaction(JTextField field, TransactionType type, DefaultListModel<Transaction> model,
 			String label) {
 		String value = field.getText().trim();
 		if (value.isEmpty() || "Montant".equals(value)) {
@@ -296,22 +298,22 @@ public class UI_Interface extends JFrame {
 
 		List<Transaction> expenses = controller.getTransactions(TransactionType.EXPENSE);
 		for (Transaction transaction : expenses) {
-			expensesModel.addElement(formatTransaction(transaction));
+			expensesModel.addElement(transaction);
 		}
 
 		List<Transaction> incomes = controller.getTransactions(TransactionType.INCOME);
 		for (Transaction transaction : incomes) {
-			incomesModel.addElement(formatTransaction(transaction));
+			incomesModel.addElement(transaction);
 		}
 
 		balanceValue.setText(formatMoney(controller.getBalance()));
 	}
 
-	public List<String> getExpenseDisplayItems() {
+	public List<Transaction> getExpenseDisplayItems() {
 		return modelSnapshot(expensesModel);
 	}
 
-	public List<String> getIncomeDisplayItems() {
+	public List<Transaction> getIncomeDisplayItems() {
 		return modelSnapshot(incomesModel);
 	}
 
@@ -319,45 +321,20 @@ public class UI_Interface extends JFrame {
 		return balanceValue.getText();
 	}
 
-	private List<String> modelSnapshot(DefaultListModel<String> model) {
-		List<String> snapshot = new java.util.ArrayList<String>();
+	private List<Transaction> modelSnapshot(DefaultListModel<Transaction> model) {
+		List<Transaction> snapshot = new java.util.ArrayList<Transaction>();
 		for (int i = 0; i < model.size(); i++) {
 			snapshot.add(model.getElementAt(i));
 		}
 		return snapshot;
 	}
 
-	private String formatTransaction(Transaction transaction) {
-		String typeLabel = transaction.getType().name().equals("INCOME") ? "Revenu" : "Dépense";
-		return "<html><div style='padding:6px 4px;'>" + "<div><b>" + typeLabel + "</b> " + "</div>" // ajout plus tard
-																									// d'un moyen
-																									// d'afficher
-																									// les types de
-																									// dépense ou de
-																									// revenue
-																									// possible
-				+ "<div style='color:#5A606E; font-size:11px;'>" + formatMoney(transaction.getAmount()) + " • "
-				+ escapeHtml(transaction.getTimeEntered()) + "</div></div></html>";
-	}
-
 	private String formatMoney(double amount) {
 		return MONEY.format(amount) + " $";
 	}
 
-	private String extractId(String displayedTransaction) {
-		if (displayedTransaction != null && displayedTransaction.startsWith("<html>")) {
-			int markerIndex = displayedTransaction.lastIndexOf("•");
-			if (markerIndex >= 0) {
-				String tail = displayedTransaction.substring(markerIndex + 1).replace("</div></div></html>", "").trim();
-				return tail;
-			}
-		}
-		String[] parts = displayedTransaction.split("\\|\\|");
-		return parts.length > 0 ? parts[0].trim() : displayedTransaction.trim();
-	}
-
-	private void showTransactionDetails(String displayedTransaction) {
-		String id = extractId(displayedTransaction);
+	private void showTransactionDetails(Transaction selected) {
+		String id = selected.getId();
 		Transaction selectedTransaction = null;
 		List<Transaction> transactions = controller.getTransactions(null);
 		for (Transaction transaction : transactions) {
