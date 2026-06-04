@@ -392,6 +392,12 @@ public class UI_Interface extends JFrame {
 
 	private static class TransactionRenderer extends JPanel implements ListCellRenderer<Transaction> {
 		private static final long serialVersionUID = 1L;
+		private static final Color CARD_BG = Color.WHITE;
+		private static final Color CARD_SELECTED_BG = new Color(233, 242, 255);
+		private static final Color TEXT_MAIN = new Color(34, 41, 53);
+		private static final Color TEXT_SUB = new Color(99, 108, 122);
+		private static final Color INCOME = new Color(31, 122, 70);
+		private static final Color EXPENSE = new Color(176, 58, 46);
 
 		private final JLabel typeLabel = new JLabel();
 		private final JLabel descriptionLabel = new JLabel();
@@ -400,48 +406,71 @@ public class UI_Interface extends JFrame {
 
 		public TransactionRenderer() {
 			setLayout(new BorderLayout());
+			setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
 
-			JPanel top = new JPanel(new BorderLayout());
-			top.setOpaque(false);
-			top.add(typeLabel, BorderLayout.WEST);
-			top.add(amountLabel, BorderLayout.EAST);
+			JPanel card = new JPanel(new BorderLayout());
+			card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(224, 231, 240)),
+					BorderFactory.createEmptyBorder(12, 12, 12, 12)));
+			card.setOpaque(true);
 
-			JPanel center = new JPanel(new BorderLayout());
-			center.setOpaque(false);
-			center.add(descriptionLabel, BorderLayout.WEST);
+			JPanel leftPanel = new JPanel();
+			leftPanel.setOpaque(false);
+			leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
 
-			JPanel bottom = new JPanel(new BorderLayout());
-			bottom.setOpaque(false);
-			bottom.add(dateLabel, BorderLayout.WEST);
+			typeLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+			descriptionLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+			descriptionLabel.setForeground(TEXT_MAIN);
 
-			JPanel textPanel = new JPanel();
-			textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-			textPanel.setOpaque(false);
-			textPanel.add(top);
-			textPanel.add(center);
-			textPanel.add(bottom);
+			leftPanel.add(typeLabel);
+			leftPanel.add(Box.createVerticalStrut(4));
+			leftPanel.add(descriptionLabel);
 
-			add(textPanel, BorderLayout.CENTER);
+			JPanel rightPanel = new JPanel();
+			rightPanel.setOpaque(false);
+			rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
+			rightPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+
+			amountLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+			amountLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+			dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+			dateLabel.setForeground(TEXT_SUB);
+			dateLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+			rightPanel.add(amountLabel);
+			rightPanel.add(Box.createVerticalStrut(2));
+			rightPanel.add(dateLabel);
+
+			card.add(leftPanel, BorderLayout.WEST);
+			card.add(rightPanel, BorderLayout.EAST);
+
+			add(card, BorderLayout.CENTER);
 		}
 
 		@Override
 		public Component getListCellRendererComponent(JList<? extends Transaction> list, Transaction value, int index,
 				boolean isSelected, boolean cellHasFocus) {
 
-			typeLabel.setText(value.getType().name().equals("INCOME") ? "Revenu" : "Dépense");
+			boolean income = value.getType() == TransactionType.INCOME;
+
+			typeLabel.setText(income ? "Revenu" : "Dépense");
+			typeLabel.setForeground(income ? INCOME : EXPENSE);
+
 			descriptionLabel.setText(value.getDescription());
 			amountLabel.setText(value.getAmount() + " $");
+			amountLabel.setForeground(income ? INCOME : EXPENSE);
 			dateLabel.setText(value.getTimeEntered());
 
 			if (isSelected) {
-				setBackground(list.getSelectionBackground());
+				setBackground(CARD_SELECTED_BG);
 				setForeground(list.getSelectionForeground());
 			} else {
-				setBackground(Color.WHITE);
+				setBackground(CARD_BG);
 				setForeground(list.getForeground());
 			}
 
 			setOpaque(true);
+			setPreferredSize(new Dimension(10, 78));
 			return this;
 		}
 	}
