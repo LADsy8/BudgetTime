@@ -398,13 +398,51 @@ public class UI_Interface extends JFrame {
 		private final JLabel amountLabel = new JLabel();
 		private final JLabel dateLabel = new JLabel();
 
+		public TransactionRenderer() {
+			setLayout(new BorderLayout());
+
+			JPanel top = new JPanel(new BorderLayout());
+			top.setOpaque(false);
+			top.add(typeLabel, BorderLayout.WEST);
+			top.add(amountLabel, BorderLayout.EAST);
+
+			JPanel center = new JPanel(new BorderLayout());
+			center.setOpaque(false);
+			center.add(descriptionLabel, BorderLayout.WEST);
+
+			JPanel bottom = new JPanel(new BorderLayout());
+			bottom.setOpaque(false);
+			bottom.add(dateLabel, BorderLayout.WEST);
+
+			JPanel textPanel = new JPanel();
+			textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+			textPanel.setOpaque(false);
+			textPanel.add(top);
+			textPanel.add(center);
+			textPanel.add(bottom);
+
+			add(textPanel, BorderLayout.CENTER);
+		}
+
 		@Override
 		public Component getListCellRendererComponent(JList<? extends Transaction> list, Transaction value, int index,
 				boolean isSelected, boolean cellHasFocus) {
 
-			label.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
-			label.setText();
-			return label;
+			typeLabel.setText(value.getType().name().equals("INCOME") ? "Revenu" : "Dépense");
+			descriptionLabel.setText(value.getDescription());
+			amountLabel.setText(value.getAmount() + " $");
+			dateLabel.setText(value.getTimeEntered());
+
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			} else {
+				setBackground(Color.WHITE);
+				setForeground(list.getForeground());
+			}
+
+			setOpaque(true);
+			return this;
 		}
 	}
 }
