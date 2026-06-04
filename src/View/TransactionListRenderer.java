@@ -54,6 +54,9 @@ public class TransactionListRenderer extends JPanel implements ListCellRenderer<
 		descriptionArea.setFont(new Font("Segoe UI", Font.BOLD, 14));
 		descriptionArea.setForeground(TEXT_MAIN);
 		descriptionArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		descriptionArea.setRows(2);
+		descriptionArea.setColumns(18);
+		descriptionArea.setAlignmentX(LEFT_ALIGNMENT);
 
 		JPanel footer = new JPanel(new BorderLayout());
 		footer.setOpaque(false);
@@ -80,6 +83,7 @@ public class TransactionListRenderer extends JPanel implements ListCellRenderer<
 
 		amountLabel.setText(value.getAmount() + " $");
 		amountLabel.setForeground(income ? INCOME : EXPENSE);
+		amountLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
 		descriptionArea.setText(value.getDescription());
 		dateLabel.setText(value.getTimeEntered());
@@ -91,6 +95,7 @@ public class TransactionListRenderer extends JPanel implements ListCellRenderer<
 		}
 
 		setOpaque(true);
+		setPreferredSize(new java.awt.Dimension(10, 110));
 		return this;
 	}
 }

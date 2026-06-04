@@ -1,5 +1,7 @@
 [
   {"id":"2d496b8c-2ed7-429d-97e8-d2fc2611d201","type":"EXPENSE","description":"Épicerie","amount":1000.0,"timeEntered":"03-06-2026"},
   {"id":"37c802e6-cec1-49ec-87cd-34a3dcb57a48","type":"INCOME","description":"asdasdasdasd","amount":50000.0,"timeEntered":"03-06-2026"},
-  {"id":"e55be634-a27b-4a27-95cb-90366cfb5668","type":"EXPENSE","description":"sadadasdsadasdas","amount":1111.0,"timeEntered":"03-06-2026"}
+  {"id":"e55be634-a27b-4a27-95cb-90366cfb5668","type":"EXPENSE","description":"sadadasdsadasdas","amount":1111.0,"timeEntered":"03-06-2026"},
+  {"id":"a7a57fb9-3124-4cdd-8390-7dd1dbc071e4","type":"EXPENSE","description":"Dépense","amount":11111.0,"timeEntered":"04-06-2026"},
+  {"id":"d46f0fe9-9363-406a-8af2-f6e596ff6524","type":"INCOME","description":"Revenu","amount":13333.0,"timeEntered":"04-06-2026"}
 ]

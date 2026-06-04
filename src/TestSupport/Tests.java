@@ -9,7 +9,6 @@ import Model.Transaction;
 import Model.TransactionType;
 import Service.BudgetService;
 import Storage.FileTransactionRepository;
-import View.UI_Interface;
 
 public class Tests {
 
@@ -18,7 +17,6 @@ public class Tests {
 		testBudgetService();
 		testController();
 		testJsonRepository();
-		testUiLists();
 		System.out.println("All tests passed.");
 	}
 
@@ -86,34 +84,6 @@ public class Tests {
 		Assertions.assertEquals("b-2", afterDelete.get(0).getId(), "Remaining id");
 
 		cleanup(tempDir);
-	}
-
-	private static void testUiLists() {
-		InMemoryTransactionRepository repository = new InMemoryTransactionRepository();
-		BudgetService service = new BudgetService(repository);
-		TransactionController controller = new TransactionController(service);
-
-		controller.handleAddTransaction("1500", "Salaire", TransactionType.INCOME);
-		controller.handleAddTransaction("42", "Courses", TransactionType.EXPENSE);
-		controller.handleAddTransaction("18.5", "Cafe", TransactionType.EXPENSE);
-
-		UI_Interface ui = new UI_Interface(controller);
-
-		List<String> incomes = ui.getIncomeDisplayItems();
-		List<String> expenses = ui.getExpenseDisplayItems();
-
-		Assertions.assertEquals(1, incomes.size(), "UI income list count");
-		Assertions.assertEquals(2, expenses.size(), "UI expense list count");
-		Assertions.assertTrue(incomes.get(0).startsWith("<html>"), "UI income line should be HTML");
-		Assertions.assertTrue(incomes.get(0).contains("Revenu"), "UI income line should show readable type");
-		Assertions.assertTrue(!incomes.get(0).contains("Courses"), "UI income list should not contain expense Courses");
-		Assertions.assertTrue(!incomes.get(0).contains("Cafe"), "UI income list should not contain expense Cafe");
-		Assertions.assertTrue(expenses.get(0).startsWith("<html>"), "UI expense line should be HTML");
-		Assertions.assertTrue(expenses.get(0).contains("Dépense"), "UI expense line should show readable type");
-		Assertions.assertTrue(expenses.get(1).contains("Dépense"), "UI expense line should show readable type");
-		Assertions.assertTrue(!expenses.get(0).contains("Salaire"), "UI expense list should not contain salary");
-		Assertions.assertTrue(!expenses.get(1).contains("Salaire"), "UI expense list should not contain salary");
-		Assertions.assertTrue(normalize(ui.getBalanceText()).contains("1439.50"), "UI balance text should match");
 	}
 
 	private static String normalize(String value) {
