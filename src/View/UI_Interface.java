@@ -210,7 +210,7 @@ public class UI_Interface extends JFrame {
 
 		panel.add(form, BorderLayout.NORTH);
 
-		JList<String> list = new JList<String>(model);
+		JList<Transaction> list = new JList<Transaction>(model);
 		list.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 		list.setSelectionBackground(new Color(220, 233, 255));
 		list.setSelectionForeground(Color.DARK_GRAY);
@@ -224,7 +224,7 @@ public class UI_Interface extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 1) {
-					String selected = list.getSelectedValue();
+					Transaction selected = list.getSelectedValue();
 					if (selected != null) {
 						showTransactionDetails(selected);
 					}
