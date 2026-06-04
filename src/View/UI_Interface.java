@@ -400,49 +400,46 @@ public class UI_Interface extends JFrame {
 		private static final Color EXPENSE = new Color(176, 58, 46);
 
 		private final JLabel typeLabel = new JLabel();
-		private final JLabel descriptionLabel = new JLabel();
 		private final JLabel amountLabel = new JLabel();
 		private final JLabel dateLabel = new JLabel();
+		private final JTextArea descriptionArea = new JTextArea();
 
 		public TransactionRenderer() {
 			setLayout(new BorderLayout());
 			setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
 
-			JPanel card = new JPanel(new BorderLayout());
+			JPanel card = new JPanel(new BorderLayout(0, 8));
 			card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(224, 231, 240)),
 					BorderFactory.createEmptyBorder(12, 12, 12, 12)));
 			card.setOpaque(true);
 
-			JPanel leftPanel = new JPanel();
-			leftPanel.setOpaque(false);
-			leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+			JPanel header = new JPanel(new BorderLayout());
+			header.setOpaque(false);
 
 			typeLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-			descriptionLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-			descriptionLabel.setForeground(TEXT_MAIN);
-
-			leftPanel.add(typeLabel);
-			leftPanel.add(Box.createVerticalStrut(4));
-			leftPanel.add(descriptionLabel);
-
-			JPanel rightPanel = new JPanel();
-			rightPanel.setOpaque(false);
-			rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-			rightPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-
 			amountLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-			amountLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+
+			header.add(typeLabel, BorderLayout.WEST);
+			header.add(amountLabel, BorderLayout.EAST);
+
+			descriptionArea.setEditable(false);
+			descriptionArea.setOpaque(false);
+			descriptionArea.setLineWrap(true);
+			descriptionArea.setWrapStyleWord(true);
+			descriptionArea.setFont(new Font("Segoe UI", Font.BOLD, 14));
+			descriptionArea.setForeground(TEXT_MAIN);
+			descriptionArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+
+			JPanel footer = new JPanel(new BorderLayout());
+			footer.setOpaque(false);
 
 			dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
 			dateLabel.setForeground(TEXT_SUB);
-			dateLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
+			footer.add(dateLabel, BorderLayout.EAST);
 
-			rightPanel.add(amountLabel);
-			rightPanel.add(Box.createVerticalStrut(2));
-			rightPanel.add(dateLabel);
-
-			card.add(leftPanel, BorderLayout.WEST);
-			card.add(rightPanel, BorderLayout.EAST);
+			card.add(header, BorderLayout.NORTH);
+			card.add(descriptionArea, BorderLayout.CENTER);
+			card.add(footer, BorderLayout.SOUTH);
 
 			add(card, BorderLayout.CENTER);
 		}
@@ -456,21 +453,19 @@ public class UI_Interface extends JFrame {
 			typeLabel.setText(income ? "Revenu" : "Dépense");
 			typeLabel.setForeground(income ? INCOME : EXPENSE);
 
-			descriptionLabel.setText(value.getDescription());
 			amountLabel.setText(value.getAmount() + " $");
 			amountLabel.setForeground(income ? INCOME : EXPENSE);
+
+			descriptionArea.setText(value.getDescription());
 			dateLabel.setText(value.getTimeEntered());
 
 			if (isSelected) {
 				setBackground(CARD_SELECTED_BG);
-				setForeground(list.getSelectionForeground());
 			} else {
 				setBackground(CARD_BG);
-				setForeground(list.getForeground());
 			}
 
 			setOpaque(true);
-			setPreferredSize(new Dimension(10, 78));
 			return this;
 		}
 	}
