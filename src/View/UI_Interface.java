@@ -2,7 +2,6 @@ package View;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -33,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -224,7 +222,7 @@ public class UI_Interface extends JFrame {
 		list.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 1) {
+				if (e.getClickCount() == 2) {
 					Transaction selected = list.getSelectedValue();
 					if (selected != null) {
 						showTransactionDetails(selected);
@@ -390,83 +388,4 @@ public class UI_Interface extends JFrame {
 		dialog.setVisible(true);
 	}
 
-	private static class TransactionRenderer extends JPanel implements ListCellRenderer<Transaction> {
-		private static final long serialVersionUID = 1L;
-		private static final Color CARD_BG = Color.WHITE;
-		private static final Color CARD_SELECTED_BG = new Color(233, 242, 255);
-		private static final Color TEXT_MAIN = new Color(34, 41, 53);
-		private static final Color TEXT_SUB = new Color(99, 108, 122);
-		private static final Color INCOME = new Color(31, 122, 70);
-		private static final Color EXPENSE = new Color(176, 58, 46);
-
-		private final JLabel typeLabel = new JLabel();
-		private final JLabel amountLabel = new JLabel();
-		private final JLabel dateLabel = new JLabel();
-		private final JTextArea descriptionArea = new JTextArea();
-
-		public TransactionRenderer() {
-			setLayout(new BorderLayout());
-			setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
-
-			JPanel card = new JPanel(new BorderLayout(0, 8));
-			card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(new Color(224, 231, 240)),
-					BorderFactory.createEmptyBorder(12, 12, 12, 12)));
-			card.setOpaque(true);
-
-			JPanel header = new JPanel(new BorderLayout());
-			header.setOpaque(false);
-
-			typeLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-			amountLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-
-			header.add(typeLabel, BorderLayout.WEST);
-			header.add(amountLabel, BorderLayout.EAST);
-
-			descriptionArea.setEditable(false);
-			descriptionArea.setOpaque(false);
-			descriptionArea.setLineWrap(true);
-			descriptionArea.setWrapStyleWord(true);
-			descriptionArea.setFont(new Font("Segoe UI", Font.BOLD, 14));
-			descriptionArea.setForeground(TEXT_MAIN);
-			descriptionArea.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-			JPanel footer = new JPanel(new BorderLayout());
-			footer.setOpaque(false);
-
-			dateLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-			dateLabel.setForeground(TEXT_SUB);
-			footer.add(dateLabel, BorderLayout.EAST);
-
-			card.add(header, BorderLayout.NORTH);
-			card.add(descriptionArea, BorderLayout.CENTER);
-			card.add(footer, BorderLayout.SOUTH);
-
-			add(card, BorderLayout.CENTER);
-		}
-
-		@Override
-		public Component getListCellRendererComponent(JList<? extends Transaction> list, Transaction value, int index,
-				boolean isSelected, boolean cellHasFocus) {
-
-			boolean income = value.getType() == TransactionType.INCOME;
-
-			typeLabel.setText(income ? "Revenu" : "Dépense");
-			typeLabel.setForeground(income ? INCOME : EXPENSE);
-
-			amountLabel.setText(value.getAmount() + " $");
-			amountLabel.setForeground(income ? INCOME : EXPENSE);
-
-			descriptionArea.setText(value.getDescription());
-			dateLabel.setText(value.getTimeEntered());
-
-			if (isSelected) {
-				setBackground(CARD_SELECTED_BG);
-			} else {
-				setBackground(CARD_BG);
-			}
-
-			setOpaque(true);
-			return this;
-		}
-	}
 }
