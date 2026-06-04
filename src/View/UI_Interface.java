@@ -2,6 +2,7 @@ package View;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -18,7 +19,6 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.InputMap;
 import javax.swing.JButton;
@@ -33,6 +33,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -389,18 +390,20 @@ public class UI_Interface extends JFrame {
 		dialog.setVisible(true);
 	}
 
-	private String escapeHtml(String value) {
-		return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-	}
-
-	private static class TransactionRenderer extends DefaultListCellRenderer {
+	private static class TransactionRenderer extends JPanel implements ListCellRenderer<Transaction> {
 		private static final long serialVersionUID = 1L;
 
+		private final JLabel typeLabel = new JLabel();
+		private final JLabel descriptionLabel = new JLabel();
+		private final JLabel amountLabel = new JLabel();
+		private final JLabel dateLabel = new JLabel();
+
 		@Override
-		public java.awt.Component getListCellRendererComponent(JList<?> list, Object value, int index,
+		public Component getListCellRendererComponent(JList<? extends Transaction> list, Transaction value, int index,
 				boolean isSelected, boolean cellHasFocus) {
-			JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
 			label.setBorder(BorderFactory.createEmptyBorder(8, 10, 8, 10));
+			label.setText();
 			return label;
 		}
 	}
